@@ -1,0 +1,1048 @@
+local Library = loadstring(game:HttpGetAsync("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau"))()
+local SaveManager = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ActualMasterOogway/Fluent-Renewed/master/Addons/SaveManager.luau"))()
+local InterfaceManager = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ActualMasterOogway/Fluent-Renewed/master/Addons/InterfaceManager.luau"))()
+--local MarketplaceService = game:GetService("MarketplaceService")
+--local gamename = MarketplaceService:GetProductInfo(game.PlaceId).Name
+
+
+local Window = Library:CreateWindow({
+    Title = "Apel Hub",
+    SubTitle = tostring("Bubble Gum Simulator Infinity"),
+    TabWidth = 160,
+    Size = UDim2.fromOffset(900, 600),
+    Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
+    Resize = true, -- Resize this ^ Size according to a 1920x1080 screen, good for mobile users but may look weird on some devices
+    MinSize = Vector2.new(250, 250),
+    Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
+})
+
+local Tabs = {
+    Credits = Window:CreateTab({Title = "Credits", Icon = "book"}),
+    Farm = Window:CreateTab({ Title = "Farming", Icon = "align-center" }),
+    Teleport = Window:CreateTab({Title = "Teleport", Icon = "users"}),
+    Eggs = Window:CreateTab({Title = "Eggs", Icon = "egg"}),
+    Chests = Window:CreateTab({Title = "Chests", Icon = "treasure-chest"}),
+    AutoBuy = Window:CreateTab({Title = "Auto Buy", Icon = "shopping-cart"}),
+    Misc = Window:CreateTab({Title = " Misc", Icon = "diamond"}),
+    Settings = Window:CreateTab({ Title = "Settings", Icon = "settings" }),
+
+}
+
+Tabs.Credits:CreateParagraph("Aligned Paragraph", {
+    Title = "Discord",
+    Content = "https://discord.gg/4gDAbj2VXG\n Dev - Apelsinka",
+    TitleAlignment = "Middle",
+    ContentAlignment = Enum.TextXAlignment.Center
+})
+
+Tabs.Credits:CreateButton({
+    Title = "Copy Discord link",
+    Description = "Click it",
+    TitleAlignment = "Middle",
+    ContentAlignment = Enum.TextXAlignment.Center,
+    Callback = function()
+        local link = "https://discord.gg/4gDAbj2VXG"
+        setclipboard(link)
+    end
+})
+
+
+local Options = Library.Options
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character
+    local bb=game:service'VirtualUser'
+    game:service'Players'.LocalPlayer.Idled:connect(function()
+    bb:CaptureController()bb:ClickButton2(Vector2.new())end)
+
+folderName = "Apel Hub"
+PositionfileName = "Saved Position3.txt"
+PositionfolderPath = folderName .. "\\" .. PositionfileName
+
+-- Проверяем, существует ли папка
+if not isfolder(folderName) then
+    makefolder(folderName)  -- Создаем папку, если она не существует
+    print("Папка '" .. folderName .. "' была создана.")
+else
+    print("Папка '" .. folderName .. "' уже существует.")
+end
+
+-- Проверяем, существует ли файл
+if not isfile(PositionfolderPath) then
+    local positionforsave = "41.17556381225586, 9.19631576538086, -42.34333419799805"
+    if not isfile(PositionfolderPath) then
+        writefile(PositionfolderPath, tostring(positionforsave))
+    end
+
+    print("Файл '" .. PositionfileName.." был создан и записан.")
+else
+    print("Файл '" .. PositionfileName.." был создан и записан.")
+end
+
+coroutine.wrap(function()
+    local GC = getconnections or get_signal_cons
+	if GC then
+		for i,v in pairs(GC(game:GetService("Players").LocalPlayer.Idled)) do
+			if v["Disable"] then
+				v["Disable"](v)
+			elseif v["Disconnect"] then
+				v["Disconnect"](v)
+			end
+		end
+	else
+		local VirtualUser = cloneref(game:GetService("VirtualUser"))
+		game:GetService("Players").LocalPlayer.Idled:Connect(function()
+			VirtualUser:CaptureController()
+			VirtualUser:ClickButton2(Vector2.new())
+		end)
+	end
+end)()
+
+do
+    
+    local function findHumanoidRootPart()
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        if character then
+            local rootPart = character:FindFirstChild("HumanoidRootPart")
+            if rootPart then
+                return rootPart
+            end
+        end
+    end
+
+    local AutoBlowBubble = Tabs.Farm:CreateToggle("Auto Blow Bubble", {Title = "Auto Blow Bubble", Default = false, Description = ""})
+
+    AutoBlowBubble:OnChanged(function(State)
+        getgenv().AutoBlowBubble = State
+        while getgenv().AutoBlowBubble == true do
+            if not getgenv().AutoBlowBubble == true then return end
+            task.wait(0.01)
+            local args = {
+                [1] = "BlowBubble"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+        end
+    end)
+
+    local AutoSellBubble = Tabs.Farm:CreateToggle("Auto Sell Bubble", {Title = "Auto Sell Bubble", Default = false, Description = ""})
+
+    AutoSellBubble:OnChanged(function(State)
+        getgenv().AutoSellBubble = State
+        while getgenv().AutoSellBubble == true do
+            if not getgenv().AutoSellBubble == true then return end
+            task.wait(1)
+            local args = {
+                [1] = "SellBubble"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+        end
+    end)
+
+
+
+    local AutoCollectDrops = Tabs.Misc:CreateToggle("Auto Collect Drops", {Title = "Auto Collect Drops", Default = false, Description = ""})
+
+    AutoCollectDrops:OnChanged(function(State)
+        getgenv().CollectablesToggle = State
+    end)
+
+    local StatsUtil = require(game:GetService("ReplicatedStorage").Shared.Utils.Stats.StatsUtil)
+
+    local oldGetPickupRange
+    oldGetPickupRange = hookfunction(StatsUtil.GetPickupRange, function(...)
+        if getgenv().CollectablesToggle then
+            return math.huge
+        end
+        return oldGetPickupRange(...)
+    end)
+
+    local AutoCollectPlayTimeRewards = Tabs.Misc:CreateToggle("Auto Collect PlayTime Rewards", {Title = "Auto Collect Playtime Rewards", Default = false, Description = ""})
+
+    AutoCollectPlayTimeRewards:OnChanged(function(State)
+        getgenv().AutoCollectPlayTimeRewards = State
+        while getgenv().AutoCollectPlayTimeRewards == true do
+            if not getgenv().AutoCollectPlayTimeRewards == true then return end
+            task.wait(10)
+            for i = 1, 10 do
+                task.wait(0.1)
+                local args = {
+                    [1] = "ClaimPlaytime",
+                    [2] = i
+                }
+                
+                game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Function"):InvokeServer(unpack(args))
+            end
+
+        end
+    end)
+
+
+    local AutoDoggyJump = Tabs.Misc:CreateToggle("AutoDoggyJump", {Title = "Auto Doggy Jump", Default = false, Description = ""})
+
+    AutoDoggyJump:OnChanged(function(State)
+        getgenv().AutoDoggyJump = State
+        while getgenv().AutoDoggyJump == true do
+            if not getgenv().AutoDoggyJump == true then return end
+            task.wait(10)
+            local args = {
+                [1] = "DoggyJumpWin",
+                [2] = 3
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))  
+        end
+    end)
+
+    local AutoOpenMysteryBox = Tabs.Misc:CreateToggle("Auto Open Mystery Box", {Title = "Auto Open Mystery Box", Default = false, Description = ""})
+
+    AutoOpenMysteryBox:OnChanged(function(State)
+        getgenv().AutoOpenMysteryBox = State
+        while getgenv().AutoOpenMysteryBox == true do
+            if not getgenv().AutoOpenMysteryBox == true then return end
+            task.wait(1)
+            local args = {
+                [1] = "UseGift",
+                [2] = "Mystery Box",
+                [3] = 10
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+            task.wait(1)
+            for i, v in pairs(workspace.Rendered.Gifts:GetChildren()) do
+                local args = {
+                    [1] = "ClaimGift",
+                    [2] = v.Name
+                }
+                
+                game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))     
+            end
+            task.wait(5)
+            for i, v in pairs(workspace.Rendered.Gifts:GetChildren()) do
+                v:Destroy()
+            end
+        end
+    end)
+
+    local AutoClaimSeason = Tabs.Misc:CreateToggle("Auto Claim Season", {Title = "Auto Claim Season Rewards", Default = false, Description = ""})
+
+    AutoClaimSeason:OnChanged(function(State)
+        getgenv().AutoClaimSeason = State
+        while getgenv().AutoClaimSeason == true do
+            if not getgenv().AutoClaimSeason == true then return end
+            task.wait(1)
+            local args = {
+                [1] = "ClaimSeason"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+        end
+    end)
+
+
+
+    local speed = 2500 -- Set this lower to make it slower
+    local bodyvelocityenabled = false -- Set this to false if you are getting kicked
+    local teleportRadius = 50
+
+    local activeTween = nil 
+
+    local function moveToPart(enemy)
+        if character ~= nil then
+            local ts = game:GetService("TweenService")
+            
+            local targetPosition = Vector3.new(enemy.Position.X+5, enemy.Position.Y + 10, enemy.Position.Z)
+            
+            local hm = findHumanoidRootPart()
+            local dist = (hm.Position - targetPosition).magnitude
+            if dist > teleportRadius then
+                
+                local tweenspeed = 10
+                local ti = TweenInfo.new(tonumber(tweenspeed), Enum.EasingStyle.Linear)
+                local tp = {CFrame = CFrame.new(targetPosition)}
+                
+
+                activeTween = ts:Create(hm, ti, tp)
+                activeTween:Play()
+            end
+        end
+    end
+
+    local function moveToSavedCoord()
+        if character ~= nil then
+            local ts = game:GetService("TweenService")
+            local targetPosition = getgenv().SavedPosition
+            local hm = findHumanoidRootPart()
+            
+            if hm == nil then
+                warn("HumanoidRootPart not found")
+                return
+            end
+            
+            local dist = (hm.Position - targetPosition).magnitude
+            if dist > teleportRadius then
+                local tweenspeed = 10
+                local ti = TweenInfo.new(tweenspeed, Enum.EasingStyle.Linear)
+                local tp = {CFrame = CFrame.new(targetPosition)}
+                
+                activeTween = ts:Create(hm, ti, tp)
+                activeTween:Play()
+            end
+        end
+    end
+    
+
+    local savedPositionString = readfile(PositionfolderPath)
+    local positionValues = {}
+
+    -- Разделяем строку на отдельные координаты
+    for value in string.gmatch(savedPositionString, "[^,]+") do
+        table.insert(positionValues, tonumber(value))
+    end
+
+    -- Проверяем, что у нас есть три координаты
+    if #positionValues == 3 then
+        -- Создаем CFrame из координат
+        getgenv().SavedPosition = Vector3.new(positionValues[1], positionValues[2], positionValues[3])
+        print("Сохраненная позиция установлена:", getgenv().SavedPosition)
+    else
+        warn("Ошибка: неверное количество координат в файле.")
+    end
+
+    local currentPositionParagraph = Tabs.Eggs:CreateParagraph("Current pos paragraph", {
+        Title = "Current Position",
+        Content = "Position: "..savedPositionString
+    })
+    
+    local function updatePosition()
+
+        local HumanoidRootPart = findHumanoidRootPart()
+        getgenv().SavedPosition = HumanoidRootPart.Position
+        writefile(PositionfolderPath, tostring(getgenv().SavedPosition.x)..","..tostring(getgenv().SavedPosition.y)..","..tostring(getgenv().SavedPosition.z))
+        currentPositionParagraph:SetValue("Position: " .. tostring(getgenv().SavedPosition))
+    end
+    
+    Tabs.Eggs:CreateButton({
+        Title = "Save New Position",
+        Description = "Change your position for auto teleport",
+        Callback = function()
+            -- Вызываем функцию обновления позиции и карты
+            updatePosition()
+        end
+    })
+    
+    local function teleportToSavedPosition()
+        if getgenv().SavedPosition then
+            moveToSavedCoord()
+        else
+            warn("Saved world or position is not set.")
+        end
+    end
+
+    Tabs.Eggs:CreateButton({
+        Title = "Teleport To Saved Position",
+        Description = "",
+        Callback = function()
+            teleportToSavedPosition()
+        end
+    })
+    
+
+    local function getEggList()
+        local Shalom = require(game:GetService("ReplicatedStorage").Shared.Data.Eggs)
+        local AvatarsData = Shalom
+        local EggList = {}
+        for i,v in pairs(AvatarsData) do
+            table.insert(EggList, tostring(i))
+        end
+        return EggList
+    end
+
+    local egglist = getEggList()
+
+
+    local currenteggforfarm = nil
+    local EggsDropDown = Tabs.Eggs:CreateDropdown("Egg List", {Title = "Select Egg For Auto Open", Description = "", Values = egglist, Multi = false, Default = 1,})
+    EggsDropDown:OnChanged(function(Value)
+        currenteggforfarm = Value
+        print(currenteggforfarm)
+    end)
+
+    getgenv().AmountOfEggs = 1
+    local AmountOfEggForOpen = Tabs.Eggs:CreateInput("Amount Of Eggs", {
+        Title = "Amount Of Eggs For Auto Open",
+        Default = 1, 
+        Description = "",
+        Numeric = true,
+        Finished = false,
+        Callback = function(Value)
+            getgenv().AmountOfEggs = tonumber(Value)
+        end
+    })
+    AmountOfEggForOpen:OnChanged(function(Value)
+        getgenv().AmountOfEggs = tonumber(Value)
+    end)
+
+    local AutoOpenEggs = Tabs.Eggs:CreateToggle("Auto Open Eggs", {Title = "Auto Open Selected Egg", Default = false, Description = ""})
+
+    AutoOpenEggs:OnChanged(function(state)
+        getgenv().AutoOpenEggs = state
+        while getgenv().AutoOpenEggs do
+            task.wait(0.01)
+
+            local args = {
+                [1] = "HatchEgg",
+                [2] = EggsDropDown.Value,
+                [3] = getgenv().AmountOfEggs
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+            
+        end
+    end)
+
+
+    local egglist2 = getEggList()
+    table.insert(egglist2, "Man Egg")
+
+    local currentRifteggforfarm = nil
+    local RiftEggsDropDown = Tabs.Eggs:CreateDropdown("Egg Rift List", {Title = "Select Rift Egg For Auto Open", Description = "", Values = egglist2, Multi = true, Default = {}})
+    
+    function RiftEggsDropDown:GetSelectedValues()
+        local selected = {}
+        for value, state in pairs(self.Value) do
+            if state then
+                table.insert(selected, value)
+            end
+        end
+        return selected
+    end
+
+    local function containsValue(value, table)
+        for _, v in ipairs(table) do
+            if v == value then
+                return true
+            end
+        end
+        return false
+    end
+
+    local RiftFolder = workspace.Rendered.Rifts
+
+    local function findNearestIsland()
+        local closestIsland = nil
+        local closestDistance = math.huge
+        local rootPart = findHumanoidRootPart()
+
+        local SelectedIslands = RiftEggsDropDown:GetSelectedValues()
+        if #SelectedIslands > 0 then
+            for _, enemy in pairs(RiftFolder:GetDescendants()) do
+                if enemy:IsA("Model") then
+                    local rnenemyname = enemy.Name
+                        rnenemyname = string.gsub(rnenemyname, "-", " ")
+                        rnenemyname = string.gsub(rnenemyname, "(%a)(%w*)", function(first, rest) 
+                            return first:upper() .. rest:lower() 
+                        end)
+                    local partforteleport = enemy:FindFirstChild("Decoration")
+                    if partforteleport then
+                        local partforteleport2 = partforteleport:FindFirstChild("Meshes/floatingisland1_Circle.003")
+                        if partforteleport2 and rootPart then
+                            if partforteleport2.Position and rootPart.Position then
+                                local distance = (rootPart.Position - partforteleport2.Position).Magnitude
+                    
+                                if containsValue(rnenemyname, SelectedIslands) and distance < closestDistance then
+                                    closestDistance = distance
+                                    closestIsland = partforteleport2
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+    
+        return closestIsland
+    end
+
+    local function findNearestEgg()
+        local closestIsland = nil
+        local closestDistance = math.huge
+        local rootPart = findHumanoidRootPart()
+        local closestEggName = nil
+        local SelectedIslands = RiftEggsDropDown:GetSelectedValues()
+        if #SelectedIslands > 0 then
+            for _, enemy in pairs(RiftFolder:GetDescendants()) do
+                if enemy:IsA("Model") then
+                    local rnenemyname = enemy.Name
+                        rnenemyname = string.gsub(rnenemyname, "-", " ")
+                        rnenemyname = string.gsub(rnenemyname, "(%a)(%w*)", function(first, rest) 
+                            return first:upper() .. rest:lower() 
+                        end)
+                    local partforteleport = enemy:FindFirstChild("Decoration")
+                    if partforteleport then
+                        local partforteleport2 = partforteleport:FindFirstChild("Meshes/floatingisland1_Circle.003")
+                        if partforteleport2 and rootPart then
+                            if partforteleport2.Position and rootPart.Position then
+                                local distance = (rootPart.Position - partforteleport2.Position).Magnitude
+                    
+                                if containsValue(rnenemyname, SelectedIslands) and distance < closestDistance then
+                                    closestDistance = distance
+                                    closestIsland = partforteleport2
+                                    closestEggName = rnenemyname
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+    
+        return closestEggName
+    end
+
+    getgenv().TryingToOpenRiftChest = false
+    getgenv().TryingToOpenRiftEgg = false
+    coroutine.wrap(function()
+        while true do
+            task.wait(25)
+            getgenv().TryingToOpenRiftEgg = false
+            getgenv().TryingToOpenRiftChest = false
+
+        end
+    end)()
+    local AutoOpenRiftEggs = Tabs.Eggs:CreateToggle("Auto Open Rift Eggs", {Title = "Auto Open Selected Rift Eggs", Default = false, Description = ""})
+    AutoOpenRiftEggs:OnChanged(function(state)
+        getgenv().AutoOpenRiftEggs = state
+            if getgenv().AutoOpenRiftEgg == false then
+                getgenv().TryingToOpenRiftEgg = false
+                if activeTween then
+                    task.wait(1)
+                    activeTween:Cancel()  -- Stop the active tween
+                    activeTween = nil      -- Reset the active tween variable
+                end
+            end
+
+            coroutine.wrap(function()
+                while getgenv().AutoOpenRiftEgg == true do
+                    task.wait(15)
+                    getgenv().TryingToOpenRiftEgg = false
+                end
+            end)()
+
+            local function teleportToNearestIsland()
+                local nearestIsland = findNearestIsland()
+                if getgenv().TryingToOpenRiftChest == false then
+                    local hm = findHumanoidRootPart()
+                    if nearestIsland  and hm then
+                        moveToPart(nearestIsland)
+                        task.wait(11)
+                        hm.Anchored = true
+                        task.wait(2)
+                        hm.Anchored = false
+                        task.wait(5)
+                    end
+                end
+            end
+
+            coroutine.wrap(function()
+                while getgenv().AutoOpenRiftEggs == true do
+                    task.wait()
+                    teleportToNearestIsland()
+                end
+            end)()
+
+            local function OpenNearestEgg()
+                local nearestEgg = findNearestEgg()
+                if nearestEgg ~= nil then
+                    if getgenv().TryingToOpenRiftChest == false then
+                    getgenv().TryingToOpenRiftEgg = true
+                    local args = {
+                        [1] = "HatchEgg",
+                        [2] = nearestEgg,
+                        [3] = getgenv().AmountOfEggs
+                    }
+                    
+                    game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+                    end
+                end
+            end
+
+            coroutine.wrap(function()
+                while getgenv().AutoOpenRiftEggs == true do
+                    task.wait()
+                    OpenNearestEgg()
+                end
+            end)()
+
+            coroutine.wrap(function()
+                while getgenv().AutoOpenRiftEggs == true do
+                    task.wait()
+                    local nearestIsland = findNearestIsland()
+                    local hm = findHumanoidRootPart()
+                    if nearestIsland == nil and getgenv().TryingToOpenRiftEgg == false and getgenv().TryingToOpenRiftChest == false and hm then
+                        moveToSavedCoord()
+                        task.wait(11)
+                        hm.Anchored = true
+                        task.wait(2)
+                        hm.Anchored = false
+                        task.wait(5)
+                        getgenv().TryingToOpenRiftEgg = false
+                    end
+                end
+            end)()
+
+
+    end)
+
+    Tabs.Eggs:CreateButton({
+        Title = "Auto Cancel Open Animation",
+        Description = "",
+        Callback = function()
+            local ClientHatchEgg = require(game:GetService('ReplicatedStorage').Client.Effects.HatchEgg)
+            ClientHatchEgg.Play = function() return end
+        end
+    })
+
+    local function unlockAllIslands()
+        for i, v in pairs(workspace.Worlds["The Overworld"].Islands:GetDescendants()) do
+            if v.Name == "UnlockHitbox" then
+                local hm = findHumanoidRootPart()
+                hm.CFrame = CFrame.new(v.Position)
+                task.wait(0.1)
+            end
+        end
+    end
+
+    Tabs.Teleport:CreateButton{
+        Title = "Unlock All Islands",
+        Description = "",
+        Callback = function()
+            unlockAllIslands()
+        end
+    }
+    
+    Tabs.Teleport:CreateButton{
+        Title = "Teleport to Spawn",
+        Description = "",
+        Callback = function()
+            local args = {
+                [1] = "Teleport",
+                [2] = "Workspace.Worlds.The Overworld.PortalSpawn"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+        end
+    }
+
+    for i, v in pairs(workspace.Worlds["The Overworld"].Islands:GetChildren()) do
+        Tabs.Teleport:CreateButton{
+            Title = "Teleport to "..tostring(v.Name),
+            Description = "",
+            Callback = function()
+                local args = {
+                    [1] = "Teleport",
+                    [2] = "Workspace.Worlds.The Overworld.Islands."..tostring(v.Name)..".Island.Portal.Spawn"
+                }
+                
+                game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))     
+            end
+        }
+    end
+
+
+    local AutoUpgradeBuffsMastery = Tabs.Misc:CreateToggle("AutoUpgradeBuffsMastery", {Title = "Auto Upgrade Buffs Mastery", Default = false, Description = ""})
+
+    AutoUpgradeBuffsMastery:OnChanged(function(state)
+        getgenv().AutoUpgradeBuffsMastery = state
+        while getgenv().AutoUpgradeBuffsMastery do
+            task.wait(10)
+            local args = {
+                [1] = "UpgradeMastery",
+                [2] = "Buffs"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+        end
+    end)
+
+    local AutoUpgradePetsMastery = Tabs.Misc:CreateToggle("AutoUpgradePetsMastery", {Title = "Auto Upgrade Pets Mastery", Default = false, Description = ""})
+
+    AutoUpgradePetsMastery:OnChanged(function(state)
+        getgenv().AutoUpgradePetsMastery = state
+        while getgenv().AutoUpgradePetsMastery do
+            task.wait(10)
+            local args = {
+                [1] = "UpgradeMastery",
+                [2] = "Pets"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+        end
+    end)
+
+    local AutoUpgradeShopsMastery = Tabs.Misc:CreateToggle("AutoUpgradeShopsMastery", {Title = "Auto Upgrade Shops Mastery", Default = false, Description = ""})
+
+    AutoUpgradeShopsMastery:OnChanged(function(state)
+        getgenv().AutoUpgradeShopsMastery = state
+        while getgenv().AutoUpgradeShopsMastery do
+            task.wait(10)
+            local args = {
+                [1] = "UpgradeMastery",
+                [2] = "Shops"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))            
+        end
+    end)
+
+
+
+    
+    local AutoSpinWheel = Tabs.Misc:CreateToggle("AutoSpinWheel", {Title = "Auto Spin Wheel", Default = false, Description = ""})
+
+    AutoSpinWheel:OnChanged(function(state)
+        getgenv().AutoSpinWheel = state
+        while getgenv().AutoSpinWheel do
+            task.wait(10)
+            local args = {
+                [1] = "ClaimFreeWheelSpin"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+            task.wait()
+            local args = {
+                [1] = "WheelSpin"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Function"):InvokeServer(unpack(args))
+            task.wait()
+            local args = {
+                [1] = "ClaimWheelSpinQueue"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))            
+        end
+    end)
+    
+
+    local AutoAcceptGenieQuest = Tabs.Misc:CreateToggle("AutoAcceptGenieQuest", {Title = "Auto Accept Genie Quest", Default = false, Description = ""})
+
+    AutoAcceptGenieQuest:OnChanged(function(state)
+        getgenv().AutoAcceptGenieQuest = state
+        while getgenv().AutoAcceptGenieQuest do
+            task.wait(10)
+            local args = {
+                [1] = "StartGenieQuest",
+                [2] = 3
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+        end
+    end)
+    
+    local chestsList = {"golden-chest", "royal-chest"}
+
+
+    local RiftChestsDropdown = Tabs.Chests:CreateDropdown("Chests Rift List", {Title = "Select Rift Chest For Auto Open", Description = "", Values = chestsList, Multi = false, Default = {}})
+
+    local function findNearestIslandForChest()
+        local closestIsland = nil
+        local closestDistance = math.huge
+        local rootPart = findHumanoidRootPart()
+    
+        for _, enemy in pairs(RiftFolder:GetDescendants()) do
+            if enemy:IsA("Model") then
+                local rnenemyname = enemy.Name
+                if rnenemyname == RiftChestsDropdown.Value then
+                    local partforteleport = enemy:FindFirstChild("Chest")
+                    if partforteleport then
+                        local partforteleport2 = partforteleport:FindFirstChild("Inner")
+                        if partforteleport2 and rootPart then
+                            if partforteleport2.Position and rootPart.Position then
+                                local distance = (rootPart.Position - partforteleport2.Position).Magnitude
+                                if enemy:GetAttribute("Type") == "Chest" then
+                                    if distance < closestDistance then
+                                        closestDistance = distance
+                                        closestIsland = partforteleport2
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    
+        return closestIsland
+    end
+
+    local function findNearestChest()
+        local closestIsland = nil
+        local closestDistance = math.huge
+        local rootPart = findHumanoidRootPart()
+        local closestChestName = nil
+        --local SelectedChests = RiftChestsDropdown:GetSelectedValues()
+            for _, enemy in pairs(RiftFolder:GetDescendants()) do
+                if enemy:IsA("Model") then
+                    local rnenemyname = enemy.Name
+                    if rnenemyname == RiftChestsDropdown.Value then
+                        local partforteleport = enemy:FindFirstChild("Chest")
+                        if partforteleport then
+                            local partforteleport2 = partforteleport:FindFirstChild("Inner")
+                            if partforteleport2 and rootPart then
+                                if partforteleport2.Position and rootPart.Position then
+                                    local distance = (rootPart.Position - partforteleport2.Position).Magnitude
+
+                                    if enemy:GetAttribute("Type") == "Chest" then
+                                        if distance < closestDistance then
+                                        closestDistance = distance
+                                        closestIsland = partforteleport2
+                                        closestChestName = rnenemyname
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
+
+        return closestChestName
+    end
+
+
+    local AutoOpenRiftChests = Tabs.Chests:CreateToggle("Auto Open Rift Chest", {Title = "Auto Open  Rift Chests", Default = false, Description = "THIS WONT TELEPORT YOU BACK IF YOU HAVE 0 KEYS"})
+    AutoOpenRiftChests:OnChanged(function(state)
+        getgenv().AutoOpenRiftChests = state
+            if  state == false then
+                getgenv().TryingToOpenRiftChest = false
+                if activeTween then
+                    task.wait(1)
+                    activeTween:Cancel()  -- Stop the active tween
+                    activeTween = nil      -- Reset the active tween variable
+                end
+            end
+
+            coroutine.wrap(function()
+                while getgenv().AutoOpenRiftChests == true do
+                    task.wait(30)
+                    getgenv().TryingToOpenRiftChest = false
+                end
+            end)()
+
+            local function teleportToNearestIslandForChest()
+                local nearestIsland = findNearestIslandForChest()
+                local nearestChest = findNearestChest()
+
+                if nearestIsland then
+                    local hm = findHumanoidRootPart()
+                    if nearestChest and hm then
+                        moveToPart(nearestIsland)
+                        task.wait(11)
+                        hm.Anchored = true
+                        task.wait(2)
+                        hm.Anchored = false
+                        task.wait(5)
+                        getgenv().TryingToOpenRiftChest = true
+                    end
+                end
+            end
+
+            coroutine.wrap(function()
+                while getgenv().AutoOpenRiftChests == true do
+                    task.wait()
+                    teleportToNearestIslandForChest()
+                end
+            end)()
+
+            local function OpenNearestChest()
+                local nearestChest = findNearestChest()
+
+                if nearestChest ~= nil then
+                    if nearestChest then
+                        getgenv().TryingToOpenRiftChest = true
+                        local args = {
+                            [1] = "UnlockRiftChest",
+                            [2] = nearestChest
+                        }
+                        
+                        game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+                    end
+                else
+                    getgenv().TryingToOpenRiftChest = false
+                end
+            end
+
+            coroutine.wrap(function()
+                while getgenv().AutoOpenRiftChests == true do
+                    task.wait()
+                    OpenNearestChest()
+                end
+            end)()
+
+            coroutine.wrap(function()
+                while getgenv().AutoOpenRiftChests == true do
+                    task.wait()
+                    local nearestIsland = findNearestIslandForChest()
+                    local hm = findHumanoidRootPart()
+                    if nearestIsland == nil and getgenv().TryingToOpenRiftEgg == false and getgenv().TryingToOpenRiftChest == false and hm then
+                        getgenv().TryingToOpenRiftChest = false
+                        moveToSavedCoord()
+                        task.wait(11)
+                        hm.Anchored = true
+                        task.wait(2)
+                        hm.Anchored = false
+                        task.wait(5)
+                        getgenv().TryingToOpenRiftChest = false
+                    end
+                end
+            end)()
+
+
+    end)
+
+    local AutoClaimGiantChest = Tabs.Chests:CreateToggle("AutoClaimGiantChest", {Title = "Auto Claim Giant Chest", Default = false, Description = ""})
+
+    AutoClaimGiantChest:OnChanged(function(state)
+        getgenv().AutoClaimGiantChest = state
+        while getgenv().AutoClaimGiantChest do
+            task.wait(10)
+            local args = {
+                [1] = "ClaimChest",
+                [2] = "Giant Chest"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))          
+        end
+    end)
+
+    local AutoClaimInfinityChest = Tabs.Chests:CreateToggle("AutoClaimInfinityChest", {Title = "Auto Claim Infinity Chest", Default = false, Description = ""})
+
+    AutoClaimInfinityChest:OnChanged(function(state)
+        getgenv().AutoClaimInfinityChest = state
+        while getgenv().AutoClaimInfinityChest do
+            task.wait(10)
+            local args = {
+                [1] = "ClaimChest",
+                [2] = "Infinity Chest"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))          
+        end
+    end)
+
+    local AutoClaimVoidChest = Tabs.Chests:CreateToggle("AutoClaimVoidChest", {Title = "Auto Claim Void Chest", Default = false, Description = ""})
+
+    AutoClaimVoidChest:OnChanged(function(state)
+        getgenv().AutoClaimVoidChest = state
+        while getgenv().AutoClaimVoidChest do
+            task.wait(10)
+            local args = {
+                [1] = "ClaimChest",
+                [2] = "Void Chest"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))          
+        end
+    end)
+
+
+    local AutoBuyAlienShop = Tabs.AutoBuy:CreateToggle("AutoBuyAlienShop", {Title = "Auto Buy Alien Shop", Default = false, Description = ""})
+
+    AutoBuyAlienShop:OnChanged(function(state)
+        getgenv().AutoBuyAlienShop = state
+        while getgenv().AutoBuyAlienShop do
+            task.wait(5)
+            for i = 1, 3 do
+                task.wait()
+                local args = {
+                    [1] = "BuyShopItem",
+                    [2] = "alien-shop",
+                    [3] = i
+                }
+                
+                game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+            end
+        end
+    end)
+
+    local AutoBuyBlackMarket = Tabs.AutoBuy:CreateToggle("AutoBuyBlackMarket", {Title = "Auto Buy Blackmarket", Default = false, Description = ""})
+
+    AutoBuyBlackMarket:OnChanged(function(state)
+        getgenv().AutoBuyBlackMarket = state
+        while getgenv().AutoBuyBlackMarket do
+            task.wait(5)
+            for i = 1, 3 do
+                task.wait()
+                local args = {
+                    [1] = "BuyShopItem",
+                    [2] = "shard-shop",
+                    [3] = i
+                }
+                
+                game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("Event"):FireServer(unpack(args))
+            end
+        end
+    end)
+
+
+end
+
+
+
+
+SaveManager:SetLibrary(Library)
+InterfaceManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+InterfaceManager:SetFolder("Apel Hub")
+SaveManager:SetFolder("Apel Hub/".."Bubble Gum")
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+SaveManager:LoadAutoloadConfig()
+
+local Menu = game:GetService("CoreGui"):FindFirstChild("Menu")
+if Menu then
+    print("Найдено меню")
+else
+    local Menu = Instance.new("ScreenGui")
+Menu.Name = "Menu"
+local Frame = Instance.new("Frame")
+Frame.Name = "Menu Button"
+local ImageButton = Instance.new("ImageButton")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
+
+--Properties:
+local coreGui = game:GetService("CoreGui")
+Menu.Parent = coreGui
+Menu.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Frame.Parent = Menu
+Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.167999998, 0, 0.230493277, 0)
+Frame.Size = UDim2.new(0.040533334, 0, 0.0681614354, 0)
+
+ImageButton.Parent = Frame
+ImageButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ImageButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ImageButton.BorderSizePixel = 0
+ImageButton.Size = UDim2.new(1, 0, 1, 0)
+ImageButton.Image = "http://www.roblox.com/asset/?id=181239831"
+ImageButton.MouseButton1Up:Connect(function()
+    game:GetService("VirtualInputManager"):SendKeyEvent(true,"LeftControl",false,game)
+end)
+
+UIAspectRatioConstraint.Parent = ImageButton
+
+UIAspectRatioConstraint_2.Parent = Frame
+end 
